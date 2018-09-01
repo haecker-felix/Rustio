@@ -5,8 +5,7 @@ A radio-browser.info API wrapper for rust.
 - [x] Server communication (JSON deserialize)
 - [x] Basic elements (station, country, language, state, tag)
 - [x] Server stats
-- [x] Audio playback using gstreamer
-- [ ] Error handling
+- [x] Error handling
 - [ ] Editable stations
 - [ ] Create new stations
 - [ ] Advanced station search
