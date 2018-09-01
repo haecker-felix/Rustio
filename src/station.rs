@@ -1,4 +1,6 @@
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, Hash)]
+use restson::{RestClient,RestPath,Error};
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Station {
     pub name: String,
     pub language: String,
@@ -28,10 +30,40 @@ pub struct Station {
     pub clicktrend: String,
 }
 
-impl Station{}
-
 impl PartialEq for Station {
     fn eq(&self, other: &Station) -> bool {
         self.id == other.id
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum StationResponse {
+    Stations(Vec<Station>),
+    Station(Station),
+}
+
+impl RestPath<()> for StationResponse {
+    fn get_path(_: ()) -> Result<String,Error> {
+        Ok(format!("webservice/json/stations"))
+    }
+}
+
+impl RestPath<u32> for StationResponse {
+    fn get_path(param: u32) -> Result<String,Error> {
+        Ok(format!("webservice/json/stations/byid/{}", param))
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PlayableStationUrl {
+    pub name: String,
+    pub url: String,
+}
+
+impl RestPath<u32> for PlayableStationUrl {
+    fn get_path(param: u32) -> Result<String,Error> {
+        Ok(format!("webservice/v2/xml/url/{}", param))
     }
 }

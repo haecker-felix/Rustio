@@ -1,6 +1,20 @@
-#[derive(Deserialize)]
+use restson::{RestClient,RestPath,Error};
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Country {
-    pub name: String,
     pub value: String,
     pub stationcount: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CountryResponse {
+    Countries(Vec<Country>),
+    Country(Country),
+}
+
+impl RestPath<()> for CountryResponse {
+    fn get_path(_: ()) -> Result<String,Error> {
+        Ok(format!("webservice/json/countries"))
+    }
 }

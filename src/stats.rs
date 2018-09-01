@@ -1,4 +1,6 @@
-#[derive(Deserialize)]
+use restson::{RestClient,RestPath,Error};
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Stats {
     pub stations: String,
     pub stations_broken: String,
@@ -9,18 +11,8 @@ pub struct Stats {
     pub countries: String,
 }
 
-impl Stats{
-    pub fn print(&self){
-        println!("Stations: {} ({} broken)\nTags: {}\n\
-            Languages: {}\n\
-            Countries: {}\n\
-            Clicks: {} last hour / {} last day",
-                 self.stations,
-                 self.stations_broken,
-                 self.tags,
-                 self.languages,
-                 self.countries,
-                 self.clicks_last_hour,
-                 self.clicks_last_day);
+impl RestPath<()> for Stats {
+    fn get_path(_: ()) -> Result<String,Error> {
+        Ok(format!("webservice/json/stats"))
     }
 }
