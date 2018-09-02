@@ -11,6 +11,7 @@ mod state;
 mod language;
 mod tag;
 mod stats;
+mod search;
 mod client;
 
 pub use station::Station as Station;
@@ -21,6 +22,7 @@ pub use state::State as State;
 pub use language::Language as Language;
 pub use tag::Tag as Tag;
 pub use stats::Stats as Stats;
+pub use search::StationSearch as StationSearch;
 pub use client::Client as Client;
 
 use station::StationResponse as StationResponse;

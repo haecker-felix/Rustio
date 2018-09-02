@@ -5,11 +5,12 @@ use std::sync::mpsc::channel;
 use std::thread;
 use std::rc::Rc;
 use std::cell::RefCell;
-use restson::{RestClient, Error};
+use restson::{RestClient, RestPath, Error};
 
 use {Codec, Country, Language, State, Station, Stats, Tag};
 use {CodecResponse, CountryResponse, LanguageResponse, StateResponse, StationResponse, TagResponse};
-use PlayableStationUrl;
+use {PlayableStationUrl, StationSearch};
+
 
 pub struct Client {
     rest_client: RestClient,
@@ -81,5 +82,12 @@ impl Client {
     pub fn get_playable_station_url(&mut self, id: u32) -> Result<String, Error>{
         let result: PlayableStationUrl = self.rest_client.get(id)?;
         Ok(result.url)
+    }
+
+    pub fn search(&mut self, data: StationSearch) -> Result<Vec<Station>, Error>{
+        match self.rest_client.post_capture((), &data)? {
+            StationResponse::Stations(stations) => Ok(stations),
+            _ => Err(Error::InvalidValue),
+        }
     }
 }
