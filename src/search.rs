@@ -1,6 +1,6 @@
 use restson::{RestClient,RestPath,Error};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StationSearch {
     pub name: String,
     pub name_exact: bool,

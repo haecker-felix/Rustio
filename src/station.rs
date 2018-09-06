@@ -1,6 +1,6 @@
 use restson::{RestClient,RestPath,Error};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Station {
     pub name: String,
     pub language: String,

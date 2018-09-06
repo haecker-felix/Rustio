@@ -1,6 +1,6 @@
 use restson::{RestClient,RestPath,Error};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct State {
     pub value: String,
     pub country: String,

@@ -13,6 +13,7 @@ mod tag;
 mod stats;
 mod search;
 mod client;
+mod async_client;
 
 pub use station::Station as Station;
     use station::PlayableStationUrl as PlayableStationUrl;
@@ -24,6 +25,8 @@ pub use tag::Tag as Tag;
 pub use stats::Stats as Stats;
 pub use search::StationSearch as StationSearch;
 pub use client::Client as Client;
+pub use async_client::AsyncClient as AsyncClient;
+pub use async_client::Task as Task;
 
 use station::StationResponse as StationResponse;
 use country::CountryResponse as CountryResponse;
