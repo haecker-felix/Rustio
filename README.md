@@ -9,5 +9,5 @@ A radio-browser.info API wrapper for rust.
 - [ ] Editable stations
 - [ ] Create new stations
 - [x] Advanced station search
-- [ ] Async Client
+- [x] Async Client
 - ...
