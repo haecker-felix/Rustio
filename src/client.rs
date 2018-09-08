@@ -79,8 +79,8 @@ impl Client {
         self.rest_client.get(())
     }
 
-    pub fn get_playable_station_url(&mut self, id: u32) -> Result<String, Error>{
-        let result: PlayableStationUrl = self.rest_client.get(id)?;
+    pub fn get_playable_station_url(&mut self, station: Station) -> Result<String, Error>{
+        let result: PlayableStationUrl = self.rest_client.get(station)?;
         Ok(result.url)
     }
 

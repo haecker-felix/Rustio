@@ -43,7 +43,7 @@ pub enum Task{
     GetAllStates,
     GetAllTags,
     GetStats,
-    GetPlayableStationUrl(u32),
+    GetPlayableStationUrl(Station),
     Search(StationSearch),
 }
 
@@ -119,8 +119,8 @@ impl AsyncClient{
                             let result = sync_client.get_stats().unwrap();
                             sender.send(Message::Stats(result));
                         },
-                        Task::GetPlayableStationUrl(id) => {
-                            let result = sync_client.get_playable_station_url(id).unwrap();
+                        Task::GetPlayableStationUrl(station) => {
+                            let result = sync_client.get_playable_station_url(station).unwrap();
                             sender.send(Message::PlayableStationUrl(result));
                         },
                         Task::Search(search) => {

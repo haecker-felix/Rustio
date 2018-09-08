@@ -62,8 +62,8 @@ pub struct PlayableStationUrl {
     pub url: String,
 }
 
-impl RestPath<u32> for PlayableStationUrl {
-    fn get_path(param: u32) -> Result<String,Error> {
-        Ok(format!("webservice/v2/xml/url/{}", param))
+impl RestPath<Station> for PlayableStationUrl {
+    fn get_path(param: Station) -> Result<String,Error> {
+        Ok(format!("webservice/v2/json/url/{}", param.id))
     }
 }
