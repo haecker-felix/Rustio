@@ -27,6 +27,7 @@ pub use search::StationSearch as StationSearch;
 pub use client::Client as Client;
 pub use async_client::AsyncClient as AsyncClient;
 pub use async_client::Task as Task;
+pub use async_client::Message as Message;
 
 use station::StationResponse as StationResponse;
 use country::CountryResponse as CountryResponse;
