@@ -82,11 +82,15 @@ impl AsyncClient{
         thread::spawn(move || {
             loop{
                 // Check if a task is available
-                let task = next_task.lock().unwrap().clone();
-                if(task.clone().is_some()){
+                if(next_task.lock().unwrap().clone().is_some()){
                     let mut sync_client = Client::new(&base_url);
+
+                    // Get the task, and unset "next_task"
+                    let task: Task = next_task.lock().unwrap().clone().unwrap();
+                    *next_task.lock().unwrap() = None;
+
                     // Actual work is being done here. Result get returned with mpsc::Sender.
-                    match task.clone().unwrap(){
+                    match task.clone(){
                         Task::GetStationById(id) => {
                             let result = vec![sync_client.get_station_by_id(id).unwrap()];
                             sender.send(Message::StationAdd(result));
@@ -129,12 +133,6 @@ impl AsyncClient{
                         },
                         _ => (),
                     };
-                }
-
-                // Task is done -> Delete
-                // Make sure the task is the same one, otherwise don't delete it.
-                if(*next_task.lock().unwrap() == task){
-                    *next_task.lock().unwrap() = None;
                 }
             }
         });
