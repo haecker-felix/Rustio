@@ -33,7 +33,7 @@ pub enum Message{
     Clear,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Task{
     GetStationById(u32),
     GetAllStations,
@@ -83,10 +83,10 @@ impl AsyncClient{
             loop{
                 // Check if a task is available
                 let task = next_task.lock().unwrap().clone();
-                if(task.is_some()){
+                if(task.clone().is_some()){
                     let mut sync_client = Client::new(&base_url);
                     // Actual work is being done here. Result get returned with mpsc::Sender.
-                    match task.unwrap(){
+                    match task.clone().unwrap(){
                         Task::GetStationById(id) => {
                             let result = vec![sync_client.get_station_by_id(id).unwrap()];
                             sender.send(Message::StationAdd(result));
@@ -132,7 +132,10 @@ impl AsyncClient{
                 }
 
                 // Task is done -> Delete
-                *next_task.lock().unwrap() = None;
+                // Make sure the task is the same one, otherwise don't delete it.
+                if(*next_task.lock().unwrap() == task){
+                    *next_task.lock().unwrap() = None;
+                }
             }
         });
     }
