@@ -71,7 +71,6 @@ impl AsyncClient{
 
     pub fn clear_task(&mut self){
         *self.next_task.lock().unwrap() = None;
-        self.sender.send(Message::Clear);
     }
 
     pub fn start_loop(&mut self){
@@ -84,6 +83,9 @@ impl AsyncClient{
                 // Check if a task is available
                 if(next_task.lock().unwrap().clone().is_some()){
                     let mut sync_client = Client::new(&base_url);
+
+                    // clear everything from previous task
+                    sender.send(Message::Clear);
 
                     // Get the task, and unset "next_task"
                     let task: Task = next_task.lock().unwrap().clone().unwrap();
