@@ -49,6 +49,7 @@ pub enum Task{
 
 pub struct AsyncClient{
     pub next_task: Arc<Mutex<Option<Task>>>,
+    task_id: Arc<Mutex<i32>>,
     pub base_url: Arc<String>,
     pub sender: Sender<Message>,
 }
@@ -56,25 +57,34 @@ pub struct AsyncClient{
 impl AsyncClient{
     pub fn new(base_url: String, sender: Sender<Message>) -> Self{
         let mut next_task = Arc::new(Mutex::new(None));
+        let task_id = Arc::new(Mutex::new(0));
         let base_url = Arc::new(base_url);
 
         Self{
             next_task,
+            task_id,
             base_url,
             sender,
         }
     }
 
     pub fn set_task(&mut self, task: Task){
+        // Increase the unique task id
+        *self.task_id.lock().unwrap() += 1;
+
+        // Unset old task
+        self.clear_task();
+
         *self.next_task.lock().unwrap() = Some(task);
     }
 
-    pub fn clear_task(&mut self){
+    fn clear_task(&mut self){
         *self.next_task.lock().unwrap() = None;
     }
 
     pub fn start_loop(&mut self){
         let next_task = self.next_task.clone();
+        let task_id = self.task_id.clone();
         let base_url = self.base_url.clone();
         let sender = self.sender.clone();
 
@@ -84,57 +94,67 @@ impl AsyncClient{
                 if(next_task.lock().unwrap().clone().is_some()){
                     let mut sync_client = Client::new(&base_url);
 
-                    // clear everything from previous task
+                    // Clear data from previous task
                     sender.send(Message::Clear);
 
                     // Get the task, and unset "next_task"
                     let task: Task = next_task.lock().unwrap().clone().unwrap();
                     *next_task.lock().unwrap() = None;
 
+                    // Copy current task id
+                    let working_id = task_id.lock().unwrap().clone();
+
                     // Actual work is being done here. Result get returned with mpsc::Sender.
+                    let mut result_message = None;
                     match task.clone(){
                         Task::GetStationById(id) => {
                             let result = vec![sync_client.get_station_by_id(id).unwrap()];
-                            sender.send(Message::StationAdd(result));
+                            result_message = Some(Message::StationAdd(result));
                         },
                         Task::GetAllStations => {
                             let result = sync_client.get_all_stations().unwrap();
-                            sender.send(Message::StationAdd(result));
+                            result_message = Some(Message::StationAdd(result));
                         },
                         Task::GetAllCodecs => {
                             let result = sync_client.get_all_codecs().unwrap();
-                            sender.send(Message::CodecAdd(result));
+                            result_message = Some(Message::CodecAdd(result));
                         },
                         Task::GetAllCountries => {
                             let result = sync_client.get_all_countries().unwrap();
-                            sender.send(Message::CountryAdd(result));
+                            result_message = Some(Message::CountryAdd(result));
                         },
                         Task::GetAllLanguages => {
                             let result = sync_client.get_all_languages().unwrap();
-                            sender.send(Message::LanguageAdd(result));
+                            result_message = Some(Message::LanguageAdd(result));
                         },
                         Task::GetAllStates => {
                             let result = sync_client.get_all_states().unwrap();
-                            sender.send(Message::StateAdd(result));
+                            result_message = Some(Message::StateAdd(result));
                         },
                         Task::GetAllTags => {
                             let result = sync_client.get_all_tags().unwrap();
-                            sender.send(Message::TagAdd(result));
+                            result_message = Some(Message::TagAdd(result));
                         },
                         Task::GetStats => {
                             let result = sync_client.get_stats().unwrap();
-                            sender.send(Message::Stats(result));
+                            result_message = Some(Message::Stats(result));
                         },
                         Task::GetPlayableStationUrl(station) => {
                             let result = sync_client.get_playable_station_url(station).unwrap();
-                            sender.send(Message::PlayableStationUrl(result));
+                            result_message = Some(Message::PlayableStationUrl(result));
                         },
                         Task::Search(search) => {
                             let result = sync_client.search(search).unwrap();
-                            sender.send(Message::StationAdd(result));
+                            result_message = Some(Message::StationAdd(result));
                         },
                         _ => (),
                     };
+
+                    if (working_id == *task_id.lock().unwrap()){
+                        sender.send(result_message.unwrap());
+                    }else {
+                        debug!("Task id changed, so don't send result message");
+                    }
                 }
             }
         });
