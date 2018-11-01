@@ -6,7 +6,7 @@ version = "0.0.1"
 description = "Rust API wrapper for radio-browser.info"
 
 [dependencies]
-restson = "^0.3.0"
-serde = "^1.0"
-serde_derive = "^1.0"
+restson = "0.4"
+serde = "1.0"
+serde_derive = "1.0"
 log = "0.4"
