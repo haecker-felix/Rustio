@@ -55,10 +55,10 @@ pub struct AsyncClient{
 }
 
 impl AsyncClient{
-    pub fn new(base_url: String, sender: Sender<Message>) -> Self{
+    pub fn new(base_url: &str, sender: Sender<Message>) -> Self{
         let mut next_task = Arc::new(Mutex::new(None));
         let task_id = Arc::new(Mutex::new(0));
-        let base_url = Arc::new(base_url);
+        let base_url = Arc::new(base_url.to_string());
 
         Self{
             next_task,
